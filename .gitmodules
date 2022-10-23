@@ -1,0 +1,3 @@
+[submodule "sim-cpp/subprojects/googletest"]
+	path = sim-cpp/subprojects/googletest
+	url = https://github.com/google/googletest.git
