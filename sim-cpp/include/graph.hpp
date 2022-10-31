@@ -2,40 +2,52 @@
 # include <string>
 
 namespace graph {
-    struct Edge
-    {
-        int vertex;
-        double weight;
-    };
-    
-    struct Node
-    {
-        std::string name;
-        std::vector<Edge> adjacency_list;
-    };
-    
+    using vertex_t = int;
+    using weight_t = double;
 
+    using Sinks = std::vector<std::pair<vertex_t, weight_t>>;
+    
+    using ShortestPath = std::vector<vertex_t>;
+
+    struct Node {
+        const std::string& intersection;
+        std::pair<double, double> coords;
+    };
     // adjecency list is the best representation for this graph as most of the nodes (intersections)
     // are actually between 2-8 edges. Sparse graph, no need for n^2 mem
     class Graph
-    {
+    { 
     private:
-        std::vector<Node> node_list;
-        int edges;
+
+        std::vector<Sinks&> edge_list;
+        std::vector<Node&> node_list;
+        size_t num_edges;
     public:
-        using ShortestPath = Graph;
-        ShortestPath* shortest_path(Node* source, Node* sink);
-        int num_nodes(void);
-        int num_edges(void);
-        
+        ShortestPath ShortestPath(vertex_t source, vertex_t sink);
+        size_t NumNodes(void);
+        size_t NumEdges(void);
+        void AddEdge(vertex_t source, vertex_t sink, weight_t weight);
+        void UpdateEdge(vertex_t source, vertex_t sink, weight_t weight);
+        void RemoveEdge(vertex_t source, vertex_t sink, weight_t weight);
+        void AddNode(Node& node);
+        // from matrix file generate a graph
+        auto FromMtx(std::string_view mtx);
     };
 
-    inline int Graph::num_nodes() {
-        return node_list.size();
+    size_t Graph::NumNodes() {
+        return edge_list.size();
+    }
+ 
+    size_t Graph::NumEdges() {
+        return num_edges;
     }
 
-    inline int Graph::num_edges() {
-        return edges;
+    void Graph::AddNode(Node& node) {
+        node_list.push_back(node);
     }
 
+    void Graph::AddEdge(vertex_t source, vertex_t sink, weight_t weight) {
+        edge_list[source].push_back(std::make_pair(sink, weight));
+        num_edges++;
+    }
 }
