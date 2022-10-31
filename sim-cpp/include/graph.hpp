@@ -5,22 +5,22 @@ namespace graph {
     using vertex_t = int;
     using weight_t = double;
 
-    using Sinks = std::vector<std::pair<vertex_t, weight_t>>;
-    
+    using Sink = std::pair<vertex_t, weight_t>;
+    using Sinks = std::vector<Sink>;
     using ShortestPath = std::vector<vertex_t>;
 
     struct Node {
-        const std::string& intersection;
+        std::string_view intersection;
         std::pair<double, double> coords;
     };
+
     // adjecency list is the best representation for this graph as most of the nodes (intersections)
     // are actually between 2-8 edges. Sparse graph, no need for n^2 mem
     class Graph
     { 
     private:
-
-        std::vector<Sinks&> edge_list;
-        std::vector<Node&> node_list;
+        std::vector<Sinks> edge_list;
+        std::vector<Node> node_list;
         size_t num_edges;
     public:
         ShortestPath ShortestPath(vertex_t source, vertex_t sink);
@@ -29,25 +29,30 @@ namespace graph {
         void AddEdge(vertex_t source, vertex_t sink, weight_t weight);
         void UpdateEdge(vertex_t source, vertex_t sink, weight_t weight);
         void RemoveEdge(vertex_t source, vertex_t sink, weight_t weight);
-        void AddNode(Node& node);
+        void AddNode(Node node);
         // from matrix file generate a graph
-        auto FromMtx(std::string_view mtx);
+        Graph FromMtx(std::string_view mtx);
     };
 
     size_t Graph::NumNodes() {
-        return edge_list.size();
+        return node_list.size();
     }
  
     size_t Graph::NumEdges() {
         return num_edges;
     }
 
-    void Graph::AddNode(Node& node) {
+    void Graph::AddNode(Node node) {
         node_list.push_back(node);
     }
 
     void Graph::AddEdge(vertex_t source, vertex_t sink, weight_t weight) {
         edge_list[source].push_back(std::make_pair(sink, weight));
         num_edges++;
+    }
+
+    void Graph::AddNode(Node node) {
+        node_list.push_back(node);
+        edge_list.push_back(std::vector<Sink>{});
     }
 }
